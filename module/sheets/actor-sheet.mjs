@@ -93,35 +93,30 @@ export class DeadAirActorSheet extends ActorSheet {
     // Initialize containers.
     const gear = [];
     const features = [];
-    const spells = {
-      0: [],
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-    };
+    const spells = Array.from({length: 10}, () => []);
+
 
     // Iterate through items, allocating to containers
     for (let i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
       // Append to gear.
-      if (i.type === 'item') {
-        gear.push(i);
-      }
-      // Append to features.
-      else if (i.type === 'feature') {
-        features.push(i);
-      }
-      // Append to spells.
-      else if (i.type === 'spell') {
-        if (i.system.spellLevel != undefined) {
-          spells[i.system.spellLevel].push(i);
-        }
+      switch (i.type) {
+        case 'item':
+          gear.push(i);
+
+          break;
+        
+        case 'feature':
+          features.push(i);
+
+          break;
+        case 'feature':
+          if (i.system.spellLevel != undefined) {
+            spells[i.system.spellLevel].push(i);
+          }
+          break;
+        default:
+          break;
       }
     }
 
@@ -192,12 +187,7 @@ export class DeadAirActorSheet extends ActorSheet {
     function iteratedots(value, max, stat) {
         for(let i = 0; i <= value-1; i++){
                 var Element = document.getElementById(`${stat}-${i}`);
-
-               if (i <= max-1) {
-                    Element.dataset.state = "x";
-                } else {
-                    Element.dataset.state = "/";
-                }
+                Element.dataset.state = (i <= max-1) ? 'x' : '/'
             }
      }
 
@@ -341,16 +331,18 @@ function calculatedicetoroll(html, actor, checkObj) {
 
   // Save the outcome number for later
   checkObj.outcomenumber = Number(outcome);
-
-  if ( outcome === 0 ) {
-    checkObj.outcome = "Outcome with a cost";
-  }
-  if ( outcome === 1 ) {
+  switch (outcome) {
+    case 0: 
+      checkObj.outcome = "Outcome with a cost";
+      break;
+    case 1: 
     checkObj.outcome = "Standard outcome";
-  }
-  if ( outcome === 2 ) {
+    break;
+    case 2: 
     checkObj.outcome = "Outcome with an increment";
+    break;
   }
+
 
   // Increase base successes with Soma usage and reduce Soma
   if ( usedsoma > 0 ) {
